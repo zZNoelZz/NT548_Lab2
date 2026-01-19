@@ -1,6 +1,6 @@
 # 1. Tạo IAM Role cho EC2
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2-instance-role"
+  name_prefix = "ec2-instance-role-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
