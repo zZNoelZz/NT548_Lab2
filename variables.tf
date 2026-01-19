@@ -1,7 +1,7 @@
 variable "region" {
   description = "AWS region to deploy"
   type        = string
-  default     = "ap-southeast-1" 
+  default     = "us-east-1" 
 }
 variable "ami_id" {
   description = "AMI ID cho EC2 (Ubuntu 24.04 LTS)"
