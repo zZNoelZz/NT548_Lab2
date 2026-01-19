@@ -10,14 +10,23 @@ resource "aws_security_group" "public_ec2" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.my_ip] # Giới hạn truy cập bằng IP của bạn
+    cidr_blocks = [var.my_ip] 
   }
 
-  # Egress: Cho phép tất cả lưu lượng ra ngoài
+  # Egress: Cho phép lưu lượng từ 1 số port phổ biến ra ngoài
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow HTTP outbound"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow HTTPS outbound"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -34,14 +43,23 @@ resource "aws_security_group" "private_ec2" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.public_ec2.id] # Chỉ cho phép traffic từ SG của Jump Host
+    security_groups = [aws_security_group.public_ec2.id] 
   }
 
-  # Egress: Cho phép tất cả lưu lượng ra ngoài (sẽ sử dụng NAT Gateway)
+  # Egress: Cho phép lưu lượng từ 1 số port phổ biến ra ngoài (sẽ sử dụng NAT Gateway)
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow HTTP outbound via NAT"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow HTTPS outbound via NAT"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -5,6 +5,14 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   tags = { Name = "Main-VPC" }
 }
+
+
+
+# Vô hiệu hóa Default Security Group
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+}
+
 # Internet Gateway (IGW)
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
@@ -13,7 +21,7 @@ resource "aws_internet_gateway" "main" {
 
 # Elastic IP (EIP) cho NAT Gateway
 resource "aws_eip" "nat" {
- 
+  domain = "vpc"
   tags = { Name = "NAT-EIP" }
 }
 
@@ -21,7 +29,7 @@ resource "aws_eip" "nat" {
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
-  map_public_ip_on_launch = true # Bật Public IP cho Public Subnet
+  map_public_ip_on_launch = false
   availability_zone       = "${var.region}a"
   tags = { Name = "Public-Subnet" }
 }
