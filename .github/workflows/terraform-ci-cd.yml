@@ -6,17 +6,17 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-  pull-requests: write
-  id-token: write
+env:
+  AWS_REGION: us-east-1
 
 jobs:
   terraform:
     name: 'AWS Infrastructure Deployment'
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: 'us-east-1'
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
 
     steps:
       - name: Checkout Repository
@@ -27,7 +27,7 @@ jobs:
         with:
           directory: .
           framework: terraform
-          soft_fail: true
+          soft_fail: true 
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -45,8 +45,8 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -out=tfplan -no-color
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
