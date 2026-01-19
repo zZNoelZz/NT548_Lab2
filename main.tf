@@ -21,6 +21,23 @@ data "http" "my_ip" {
 locals {
   source_ip = "${chomp(data.http.my_ip.response_body)}/32"
 }
+
+# Tìm AMI Ubuntu 24.04 LTS mới nhất
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 # 1. VPC Module 
 module "vpc" {
   source               = "./modules/vpc"
@@ -39,7 +56,7 @@ module "security_groups" {
 # 3. EC2 Module 
 module "ec2" {
   source                 = "./modules/ec2"
-  ami_id                 = var.ami_id
+  ami_id                 = data.aws_ami.ubuntu.id
   key_name               = var.key_name
   public_subnet_id       = module.vpc.public_subnet_id
   private_subnet_id      = module.vpc.private_subnet_id
