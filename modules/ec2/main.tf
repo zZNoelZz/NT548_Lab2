@@ -18,7 +18,7 @@ resource "aws_iam_role" "ec2_role" {
 
 # 2. Tạo Instance Profile 
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ec2-instance-profile"
+  name_prefix = "ec2-instance-profile-"
   role = aws_iam_role.ec2_role.name
 }
 
