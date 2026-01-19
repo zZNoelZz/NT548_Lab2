@@ -5,15 +5,16 @@ phases:
     runtime-versions:
       python: 3.12
     commands:
-      - echo "Installing cfn-lint and taskcat..."
+      - echo "Installing tools..."
       - pip install cfn-lint taskcat
   pre_build:
     commands:
       - echo "Validating CloudFormation template..."
-      - cfn-lint infrastructure.yaml
+      - cfn-lint cloudformation/infrastructure.yaml
   build:
     commands:
       - echo "Running Taskcat tests..."
+      - cd cloudformation
       - taskcat test run -c taskcat.yml
   post_build:
     commands:
@@ -21,4 +22,4 @@ phases:
 
 artifacts:
   files:
-    - infrastructure.yaml
+    - cloudformation/infrastructure.yaml
