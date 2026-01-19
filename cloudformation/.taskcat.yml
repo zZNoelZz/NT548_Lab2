@@ -8,4 +8,4 @@ tests:
     parameters:
       VpcCidr: 10.1.0.0/16
       KeyName: key
-      InstanceType: t2.micro
+      InstanceType: t3.micro
