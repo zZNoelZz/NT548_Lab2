@@ -15,7 +15,7 @@ phases:
     commands:
       - echo "Running Taskcat tests..."
       - cd cloudformation
-      - taskcat test run -c taskcat.yml
+      - taskcat test run
   post_build:
     commands:
       - echo "Build and Validation successful."
