@@ -3,11 +3,6 @@ variable "region" {
   type        = string
   default     = "us-east-1" 
 }
-variable "ami_id" {
-  description = "AMI ID cho EC2 (Ubuntu 24.04 LTS)"
-  type        = string
-  default     = "ami-00d8fc944fb171e29" 
-}
 
 variable "key_name" {
   description = "Tên Key Pair đã có trên AWS để SSH vào EC2"

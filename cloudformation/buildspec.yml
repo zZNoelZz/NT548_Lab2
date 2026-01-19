@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - echo "Installing cfn-lint and taskcat..."
+      - pip install cfn-lint taskcat
+  pre_build:
+    commands:
+      - echo "Validating CloudFormation template..."
+      - cfn-lint infrastructure.yaml
+  build:
+    commands:
+      - echo "Running Taskcat tests..."
+      - taskcat test run -c taskcat.yml
+  post_build:
+    commands:
+      - echo "Build and Validation successful."
+
+artifacts:
+  files:
+    - infrastructure.yaml
