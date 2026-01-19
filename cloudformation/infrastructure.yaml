@@ -4,7 +4,7 @@ Description: 'CloudFormation - VPC and EC2 Infrastructure'
 Parameters:
   VpcCidr:
     Type: String
-    Default: 10.0.0.0/16
+    Default: 10.1.0.0/16
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Default: key
@@ -25,7 +25,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: NT548-VPC
+          Value: NT548-VPC-CFN
 
   MyIGW:
     Type: AWS::EC2::InternetGateway
@@ -41,29 +41,16 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: 10.1.1.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
 
-  # 3. NAT Gateway
-  NatEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
-  MyNatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatEIP.AllocationId
-      SubnetId: !Ref PublicSubnet
-
-  # 4. Route Tables
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref MyVPC
 
-  PublicRoute:
+  DefaultRoute:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicRouteTable
@@ -76,7 +63,29 @@ Resources:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicRouteTable
 
-  # 5. Security Group
+  # 3. IAM Role
+  CFNInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-EC2-Role" 
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  CFNInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${AWS::StackName}-InstanceProfile"
+      Roles:
+        - !Ref CFNInstanceRole
+
+  # 4. Security Group
   InstanceSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -92,7 +101,7 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  # 6. EC2 Instance
+  # 5. EC2 Instance
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -100,6 +109,7 @@ Resources:
       ImageId: !Ref LatestAmiId
       KeyName: !Ref KeyName
       SubnetId: !Ref PublicSubnet
+      IamInstanceProfile: !Ref CFNInstanceProfile
       SecurityGroupIds:
         - !Ref InstanceSG
       Tags:
