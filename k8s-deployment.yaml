@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: python-app
-        image: zznoelzz/nt548-lab2-app:latest # Thay your-docker-id bằng tên thật của bạn
+        image: zznoelzz/nt548-lab2-app:latest
         ports:
         - containerPort: 5000
