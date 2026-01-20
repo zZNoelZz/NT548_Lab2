@@ -27,7 +27,6 @@ pipeline {
         }
         stage('Snyk Security Scan') {
             steps {
-                // Sử dụng ID 'snyk.io' bạn đã tạo
                 snykSecurity(snykInstallation: 'snyk', snykTokenId: 'snyk.io')
             }
         }
